@@ -1,0 +1,324 @@
+CREATE TABLE roles (
+    role_id     INT             IDENTITY(1,1)   PRIMARY KEY,
+    name        VARCHAR(50),
+    description NVARCHAR(MAX),
+    is_active   BIT
+);
+GO
+
+CREATE TABLE users (
+    user_id       INT             IDENTITY(1,1)   PRIMARY KEY,
+    full_name     NVARCHAR(100)   NOT NULL,
+    email         VARCHAR(150)    NOT NULL UNIQUE,
+    phone         VARCHAR(20)     UNIQUE,
+    password_hash VARCHAR(255)    NOT NULL,
+    avatar_url    VARCHAR(255),
+    role_id       INT             NOT NULL,
+    is_active     BIT             NOT NULL DEFAULT 1,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_users_roles FOREIGN KEY (role_id) REFERENCES roles(role_id)
+);
+GO
+
+ 
+CREATE TABLE user_addresses (
+    address_id      INT             IDENTITY(1,1)   PRIMARY KEY,
+    user_id         INT             NOT NULL,
+    recipient_name  NVARCHAR(100)   NOT NULL,
+    phone           VARCHAR(20)     NOT NULL,
+    address         NVARCHAR(100)   NOT NULL,
+    is_default      BIT             DEFAULT 0,
+    created_at      DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_user_addresses_users FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+GO
+ 
+-- ============================================================
+-- PRODUCT
+-- ============================================================
+ 
+CREATE TABLE categories (
+    category_id   INT             IDENTITY(1,1)   PRIMARY KEY,
+    name          NVARCHAR(100)   NOT NULL,
+    slug          VARCHAR(120)    NOT NULL UNIQUE,
+    description   NVARCHAR(500),
+    image_url     VARCHAR(255),
+    is_active     BIT             NOT NULL DEFAULT 1,
+    created_at    DATETIME2       DEFAULT GETDATE()
+);
+GO
+ 
+CREATE TABLE products (
+    product_id            INT             IDENTITY(1,1)   PRIMARY KEY,
+    category_id           INT             NOT NULL,
+    name                  NVARCHAR(200)   NOT NULL,
+    slug                  VARCHAR(220)    NOT NULL UNIQUE,
+    description           NVARCHAR(500),
+    price                 DECIMAL(12,2)   NOT NULL,
+    stock_qty             INT             NOT NULL DEFAULT 0,
+    weight_gram           INT,
+    thumbnail_image_url   VARCHAR(500),
+    is_active             BIT             NOT NULL DEFAULT 1,
+    created_at            DATETIME2       DEFAULT GETDATE(),
+    updated_at            DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_products_categories FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+GO
+ 
+CREATE TABLE product_images (
+    image_id      INT             IDENTITY(1,1)   PRIMARY KEY,
+    product_id    INT             NOT NULL,
+    image_url     VARCHAR(500)    NOT NULL,
+    sort_order    INT             DEFAULT 0,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_product_images_products FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+GO
+ 
+-- ============================================================
+-- PROMOTION
+-- ============================================================
+ 
+CREATE TABLE promotions (
+    promotion_id    INT             IDENTITY(1,1)   PRIMARY KEY,
+    code            VARCHAR(50)     NOT NULL UNIQUE,
+    description     NVARCHAR(500),
+    promotion_type  VARCHAR(30)     NOT NULL, -- percentage | fixed_amount | free_shipping
+    promotion_value DECIMAL(12,2)   NOT NULL,
+    start_date      DATE            NOT NULL,
+    end_date        DATE            NOT NULL,
+    usage_limit     INT,            -- NULL = unlimited
+    used_count      INT             NOT NULL DEFAULT 0,
+    min_order_value DECIMAL(12,2)   DEFAULT 0,
+    is_active       BIT             NOT NULL DEFAULT 1,
+    created_at      DATETIME2       DEFAULT GETDATE(),
+    updated_at      DATETIME2       DEFAULT GETDATE()
+);
+GO
+ 
+-- ============================================================
+-- SHOPPING CART
+-- ============================================================
+ 
+CREATE TABLE carts (
+    cart_id       INT             IDENTITY(1,1)   PRIMARY KEY,
+    user_id       INT             NOT NULL UNIQUE,
+    promotion_id  INT,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_carts_users       FOREIGN KEY (user_id)      REFERENCES users(user_id),
+    CONSTRAINT FK_carts_promotions  FOREIGN KEY (promotion_id) REFERENCES promotions(promotion_id)
+);
+GO
+ 
+CREATE TABLE cart_items (
+    cart_item_id  INT             IDENTITY(1,1)   PRIMARY KEY,
+    cart_id       INT             NOT NULL,
+    product_id    INT             NOT NULL,
+    quantity      INT             NOT NULL DEFAULT 1,
+    unit_price    DECIMAL(12,2)   NOT NULL, -- snapshot price at time of adding
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT UQ_cart_items_cart_product UNIQUE (cart_id, product_id),
+    CONSTRAINT FK_cart_items_carts    FOREIGN KEY (cart_id)    REFERENCES carts(cart_id),
+    CONSTRAINT FK_cart_items_products FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+GO
+ 
+-- ============================================================
+-- DELIVERY (declared before orders due to FK dependency)
+-- ============================================================
+ 
+CREATE TABLE delivery_partners (
+    partner_id    INT             IDENTITY(1,1)   PRIMARY KEY,
+    name          VARCHAR(100)    NOT NULL,
+    phone         VARCHAR(20),
+    vehicle_type  VARCHAR(50),
+    is_active     BIT             NOT NULL DEFAULT 1,
+    created_at    DATETIME2       DEFAULT GETDATE()
+);
+GO
+ 
+-- ============================================================
+-- ORDER
+-- ============================================================
+ 
+CREATE TABLE orders (
+    order_id              INT             IDENTITY(1,1)   PRIMARY KEY,
+    user_id               INT             NOT NULL,
+    address_id            INT             NOT NULL,
+    promotion_id          INT,
+    delivery_partner_id   INT,
+    status                VARCHAR(30)     NOT NULL DEFAULT 'pending', -- pending | confirmed | shipping | delivered | cancelled
+    subtotal              DECIMAL(12,2)   NOT NULL,
+    discount_amount       DECIMAL(12,2)   DEFAULT 0,
+    shipping_fee          DECIMAL(12,2)   DEFAULT 0,
+    total_amount          DECIMAL(12,2)   NOT NULL,
+    note                  NVARCHAR(600),
+    created_at            DATETIME2       DEFAULT GETDATE(),
+    updated_at            DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_orders_users              FOREIGN KEY (user_id)             REFERENCES users(user_id),
+    CONSTRAINT FK_orders_user_addresses     FOREIGN KEY (address_id)          REFERENCES user_addresses(address_id),
+    CONSTRAINT FK_orders_promotions         FOREIGN KEY (promotion_id)        REFERENCES promotions(promotion_id),
+    CONSTRAINT FK_orders_delivery_partners  FOREIGN KEY (delivery_partner_id) REFERENCES delivery_partners(partner_id)
+);
+GO
+ 
+CREATE TABLE order_items (
+    order_item_id INT             IDENTITY(1,1)   PRIMARY KEY,
+    order_id      INT             NOT NULL,
+    product_id    INT             NOT NULL,
+    quantity      INT             NOT NULL,
+    unit_price    DECIMAL(12,2)   NOT NULL, -- snapshot price at time of order
+    subtotal      DECIMAL(12,2)   NOT NULL,
+    CONSTRAINT FK_order_items_orders   FOREIGN KEY (order_id)   REFERENCES orders(order_id),
+    CONSTRAINT FK_order_items_products FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+GO
+ 
+CREATE TABLE order_status_logs (
+    log_id        INT             IDENTITY(1,1)   PRIMARY KEY,
+    order_id      INT             NOT NULL,
+    status        VARCHAR(30)     NOT NULL,
+    changed_by    INT,            -- staff or system
+    note          NVARCHAR(300),
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_order_status_logs_orders FOREIGN KEY (order_id)    REFERENCES orders(order_id),
+    CONSTRAINT FK_order_status_logs_users  FOREIGN KEY (changed_by)  REFERENCES users(user_id)
+);
+GO
+ 
+CREATE TABLE deliveries (
+    delivery_id   INT             IDENTITY(1,1)   PRIMARY KEY,
+    order_id      INT             NOT NULL UNIQUE,
+    partner_id    INT             NOT NULL,
+    status        VARCHAR(30)     NOT NULL DEFAULT 'assigned', -- assigned | picked_up | in_transit | delivered | failed
+    estimated_at  DATETIME2,
+    delivered_at  DATETIME2,
+    note          NVARCHAR(600),
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_deliveries_orders            FOREIGN KEY (order_id)   REFERENCES orders(order_id),
+    CONSTRAINT FK_deliveries_delivery_partners FOREIGN KEY (partner_id) REFERENCES delivery_partners(partner_id)
+);
+GO
+ 
+-- ============================================================
+-- PAYMENT
+-- ============================================================
+ 
+CREATE TABLE payments (
+    payment_id        INT             IDENTITY(1,1)   PRIMARY KEY,
+    order_id          INT             NOT NULL,
+    method            VARCHAR(30)     NOT NULL, -- cod | bank_transfer | vnpay | momo | zalopay
+    status            VARCHAR(30)     NOT NULL DEFAULT 'pending', -- pending | success | failed | refunded
+    amount            DECIMAL(12,2)   NOT NULL,
+    transaction_ref   VARCHAR(100),   -- gateway transaction ID
+    gateway_response  VARCHAR(600),   -- raw JSON from payment gateway
+    paid_at           DATETIME2,
+    created_at        DATETIME2       DEFAULT GETDATE(),
+    updated_at        DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+GO
+ 
+CREATE TABLE refunds (
+    refund_id     INT             IDENTITY(1,1)   PRIMARY KEY,
+    payment_id    INT             NOT NULL,
+    amount        DECIMAL(12,2)   NOT NULL,
+    reason        NVARCHAR(500),
+    status        VARCHAR(30)     NOT NULL DEFAULT 'pending', -- pending | approved | rejected | completed
+    processed_by  INT,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_refunds_payments FOREIGN KEY (payment_id)   REFERENCES payments(payment_id),
+    CONSTRAINT FK_refunds_users    FOREIGN KEY (processed_by) REFERENCES users(user_id)
+);
+GO
+ 
+-- ============================================================
+-- PRODUCT REVIEW
+-- ============================================================
+ 
+CREATE TABLE reviews (
+    review_id     INT             IDENTITY(1,1)   PRIMARY KEY,
+    product_id    INT             NOT NULL,
+    user_id       INT             NOT NULL,
+    order_id      INT,            -- ensure buyer-only reviews
+    rating        TINYINT         NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment       NVARCHAR(MAX),
+    is_active     BIT             NOT NULL DEFAULT 1,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT UQ_reviews_product_user_order UNIQUE (product_id, user_id, order_id),
+    CONSTRAINT FK_reviews_products FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CONSTRAINT FK_reviews_users    FOREIGN KEY (user_id)    REFERENCES users(user_id),
+    CONSTRAINT FK_reviews_orders   FOREIGN KEY (order_id)   REFERENCES orders(order_id)
+);
+GO
+ 
+CREATE TABLE review_replies (
+    reply_id      INT             IDENTITY(1,1)   PRIMARY KEY,
+    review_id     INT             NOT NULL,
+    staff_id      INT             NOT NULL,
+    content       NVARCHAR(MAX)   NOT NULL,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_review_replies_reviews FOREIGN KEY (review_id) REFERENCES reviews(review_id),
+    CONSTRAINT FK_review_replies_users   FOREIGN KEY (staff_id)  REFERENCES users(user_id)
+);
+GO
+ 
+-- ============================================================
+-- SUPPORT
+-- ============================================================
+ 
+CREATE TABLE support_tickets (
+    ticket_id     INT             IDENTITY(1,1)   PRIMARY KEY,
+    user_id       INT             NOT NULL,
+    order_id      INT,
+    subject       VARCHAR(200)    NOT NULL,
+    status        VARCHAR(20)     NOT NULL DEFAULT 'open', -- open | in_progress | resolved | closed
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    updated_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_support_tickets_users  FOREIGN KEY (user_id)  REFERENCES users(user_id),
+    CONSTRAINT FK_support_tickets_orders FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+GO
+ 
+CREATE TABLE support_messages (
+    message_id    INT             IDENTITY(1,1)   PRIMARY KEY,
+    ticket_id     INT             NOT NULL,
+    sender_id     INT             NOT NULL,
+    content       NVARCHAR(MAX)   NOT NULL,
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_support_messages_tickets FOREIGN KEY (ticket_id)  REFERENCES support_tickets(ticket_id),
+    CONSTRAINT FK_support_messages_users   FOREIGN KEY (sender_id)  REFERENCES users(user_id)
+);
+GO
+ 
+-- ============================================================
+-- SYSTEM CONFIGURATION
+-- ============================================================
+ 
+CREATE TABLE reports (
+    report_id     INT             IDENTITY(1,1)   PRIMARY KEY,
+    title         VARCHAR(200)    NOT NULL,
+    report_type   VARCHAR(50)     NOT NULL, -- sales | inventory | user_activity | promotion
+    generated_by  INT,
+    file_url      VARCHAR(255),
+    created_at    DATETIME2       DEFAULT GETDATE(),
+    CONSTRAINT FK_reports_users FOREIGN KEY (generated_by) REFERENCES users(user_id)
+);
+GO
+
+ CREATE TABLE notifications (
+  notification_id INT IDENTITY PRIMARY KEY,
+  user_id         INT NOT NULL,
+ order_id        INT DEFAULT 0,
+ payment_id      INT DEFAULT 0,
+ type            VARCHAR(50)  NOT NULL,
+  title           NVARCHAR(200) NOT NULL,
+message         NVARCHAR(MAX) NOT NULL,
+ is_read         BIT DEFAULT 0,
+ created_at      DATETIME DEFAULT GETDATE()
+);
