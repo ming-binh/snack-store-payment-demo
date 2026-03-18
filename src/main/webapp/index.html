@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Snack Store — Payment Demo</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="style.css">
+        <style>
+            .hero {
+                background: linear-gradient(135deg, #1A1816 0%, #2A2320 55%, #3D2812 100%);
+                color: #fff;
+                padding: 5.5rem 2rem 6rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .hero::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse 70% 60% at 65% -10%, rgba(232,121,42,.2) 0%, transparent 65%);
+            }
+            .hero::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                right: 0;
+                height: 60px;
+                background: linear-gradient(to bottom, transparent, var(--bg));
+            }
+            .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(232,121,42,.18);
+                color: #f5a060;
+                border: 1px solid rgba(232,121,42,.3);
+                border-radius: 20px;
+                padding: 5px 14px;
+                font-size: 12.5px;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                position: relative;
+                letter-spacing: .03em;
+            }
+            .hero h1 {
+                font-family: 'DM Serif Display', serif;
+                font-size: clamp(2.2rem, 6vw, 4rem);
+                font-weight: 400;
+                color: #fff;
+                margin-bottom: .6rem;
+                position: relative;
+                letter-spacing: -.03em;
+            }
+            .hero h1 span {
+                color: var(--accent);
+            }
+            .hero p {
+                color: rgba(255,255,255,.55);
+                font-size: 1.1rem;
+                position: relative;
+                max-width: 480px;
+                margin: 0 auto 2.5rem;
+                line-height: 1.7;
+            }
+            .hero-actions {
+                display: flex;
+                gap: .75rem;
+                justify-content: center;
+                position: relative;
+                flex-wrap: wrap;
+            }
+            .hero-btn-secondary {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 13px 24px;
+                border-radius: var(--radius-sm);
+                font-size: 15px;
+                font-weight: 600;
+                border: 1.5px solid rgba(255,255,255,.2);
+                color: rgba(255,255,255,.8);
+                background: rgba(255,255,255,.06);
+                cursor: pointer;
+                text-decoration: none;
+                transition: .15s;
+            }
+            .hero-btn-secondary:hover {
+                background: rgba(255,255,255,.12);
+                border-color: rgba(255,255,255,.35);
+                color: #fff;
+            }
+
+            .section {
+                padding: 4rem 0;
+            }
+            .section-header {
+                text-align: center;
+                margin-bottom: 2.5rem;
+            }
+            .section-header h2 {
+                font-family: 'DM Serif Display', serif;
+                font-size: 1.9rem;
+                font-weight: 400;
+                margin-bottom: .5rem;
+                letter-spacing: -.02em;
+            }
+            .section-header p {
+                color: var(--text-2);
+                font-size: 15px;
+            }
+
+            .flow-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+                gap: 1.2rem;
+            }
+            .flow-card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 1.75rem 1.5rem 1.5rem;
+                text-align: center;
+                text-decoration: none;
+                color: var(--text);
+                transition: transform .15s, box-shadow .15s, border-color .15s;
+                box-shadow: var(--shadow);
+                position: relative;
+                overflow: hidden;
+            }
+            .flow-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: var(--accent);
+                opacity: 0;
+                transition: opacity .15s;
+            }
+            .flow-card:hover {
+                transform: translateY(-3px);
+                box-shadow: var(--shadow-md);
+                border-color: var(--border-2);
+            }
+            .flow-card:hover::before {
+                opacity: 1;
+            }
+            .flow-card.disabled {
+                opacity: .5;
+                pointer-events: none;
+            }
+            .flow-icon {
+                font-size: 2.4rem;
+                margin-bottom: .9rem;
+                display: block;
+            }
+            .flow-label {
+                font-weight: 700;
+                font-size: .95rem;
+                margin-bottom: 4px;
+            }
+            .flow-uc {
+                font-size: 11px;
+                color: var(--text-3);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+            }
+
+            @media (max-width: 768px) {
+                .hero {
+                    padding: 4rem 1.5rem 5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <nav class="navbar">
+            <a class="navbar-brand">🍿 Snack Store</a>
+            <ul class="navbar-nav">
+                <li><a href="cart">Giỏ hàng</a></li>
+                <li><a href="payment_history">Lịch sử</a></li>
+                <li><a href="notifications">Thông báo</a></li>
+                <li><a href="admin/transactions">Admin</a></li>
+            </ul>
+            <div class="navbar-end">
+                <div class="navbar-avatar">A</div>
+                <span class="navbar-user">Nguyễn Văn A</span>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">🛠 SWD392 — Payment Module Demo</div>
+            <h1>🍿 <span>Snack</span> Store</h1>
+            <p>Hệ thống thanh toán trực tuyến tích hợp VNPay + COD với cơ sở dữ liệu đầy đủ</p>
+            <div class="hero-actions">
+                <a href="cart" class="btn btn-primary btn-xl">Vào giỏ hàng →</a>
+                <a href="admin/transactions" class="hero-btn-secondary">📊 Xem admin</a>
+            </div>
+        </div>
+
+        <div class="page-wrapper">
+
+            <!-- Customer flows -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Luồng khách hàng</h2>
+                    <p>Các màn hình dành cho Customer theo đặc tả use case SWD392</p>
+                </div>
+                <div class="flow-grid">
+                    <a class="flow-card" href="cart">
+                        <span class="flow-icon">🛒</span>
+                        <div class="flow-label">Giỏ hàng</div>
+                        <div class="flow-uc">Bước 1</div>
+                    </a>
+                    <a class="flow-card" href="checkout">
+                        <span class="flow-icon">💳</span>
+                        <div class="flow-label">Chọn thanh toán</div>
+                        <div class="flow-uc">UC-19 · UC-20</div>
+                    </a>
+                    <a class="flow-card disabled" href="#">
+                        <span class="flow-icon">🏦</span>
+                        <div class="flow-label">VNPay Gateway</div>
+                        <div class="flow-uc">UC-21 (redirect)</div>
+                    </a>
+                    <a class="flow-card" href="payment_result.jsp?status=cod&orderId=1">
+                        <span class="flow-icon">📦</span>
+                        <div class="flow-label">COD Xác nhận</div>
+                        <div class="flow-uc">UC-22</div>
+                    </a>
+                    <a class="flow-card" href="payment_result.jsp">
+                        <span class="flow-icon">✅</span>
+                        <div class="flow-label">Kết quả thanh toán</div>
+                        <div class="flow-uc">UC-23</div>
+                    </a>
+                    <a class="flow-card" href="payment_history">
+                        <span class="flow-icon">📋</span>
+                        <div class="flow-label">Lịch sử thanh toán</div>
+                        <div class="flow-uc">UC-26 · UC-27 · UC-28</div>
+                    </a>
+                    <a class="flow-card" href="notifications">
+                        <span class="flow-icon">🔔</span>
+                        <div class="flow-label">Thông báo</div>
+                        <div class="flow-uc">UC-Notify</div>
+                    </a>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Admin flows -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Luồng Admin</h2>
+                    <p>Các màn hình quản trị theo đặc tả use case</p>
+                </div>
+                <div class="flow-grid" style="margin:0 auto">
+                    <a class="flow-card" href="admin/transactions">
+                        <span class="flow-icon">📊</span>
+                        <div class="flow-label">Quản lý giao dịch</div>
+                        <div class="flow-uc">UC-24</div>
+                    </a>
+                    <a class="flow-card" href="admin/notifications">
+                        <span class="flow-icon">🔔</span>
+                        <div class="flow-label">Lịch sử thông báo</div>
+                        <div class="flow-uc">UC-Notify</div>
+                    </a>
+                    <a class="flow-card" href="admin/refunds">
+                        <span class="flow-icon">↩</span>
+                        <div class="flow-label">Quản lý hoàn tiền</div>
+                        <div class="flow-uc">UC-25</div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="site-footer">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <span class="brand-name">🍿 Snack Store</span>
+                    <p>Cửa hàng đồ ăn vặt trực tuyến uy tín hàng đầu. Giao hàng nhanh, đổi trả dễ dàng, thanh toán an toàn.</p>
+                    <div class="footer-social">
+                        <a href="#" title="Facebook">f</a>
+                        <a href="#" title="Instagram">in</a>
+                        <a href="#" title="YouTube">▶</a>
+                        <a href="#" title="TikTok">♪</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Mua sắm</h3>
+                    <ul>
+                        <li><a href="#">Đồ ăn vặt</a></li>
+                        <li><a href="#">Bánh kẹo</a></li>
+                        <li><a href="#">Nước uống</a></li>
+                        <li><a href="#">Combo tiết kiệm</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Hỗ trợ</h3>
+                    <ul>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Thanh toán</a></li>
+                        <li><a href="#">Theo dõi đơn</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Công ty</h3>
+                    <ul>
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Báo chí</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>© 2025 Snack Store. Được bảo hộ.</div>
+                <div class="footer-payment-icons">
+                    <span style="font-size:12px;color:var(--text-3);margin-right:4px">Thanh toán:</span>
+                    <span class="footer-payment-icon">VNPAY</span>
+                    <span class="footer-payment-icon">VCB</span>
+                    <span class="footer-payment-icon">TCB</span>
+                    <span class="footer-payment-icon">COD</span>
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="#">Điều khoản</a>
+                    <a href="#">Bảo mật</a>
+                    <a href="#">Cookie</a>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

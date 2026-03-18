@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="6.0"
+         xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+ 
+    <display-name>SWD Payment Demo</display-name>
+ 
+    <!-- ── Customer screens ──────────────────────────────────────────────── -->
+ 
+    <servlet>
+        <servlet-name>CartController</servlet-name>
+        <servlet-class>controller.CartController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CartController</servlet-name>
+        <url-pattern>/cart</url-pattern>
+    </servlet-mapping>
+ 
+    <servlet>
+        <servlet-name>CheckoutController</servlet-name>
+        <servlet-class>controller.CheckoutController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CheckoutController</servlet-name>
+        <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+ 
+    <servlet>
+        <servlet-name>VnpayReturnController</servlet-name>
+        <servlet-class>controller.VnpayReturnController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VnpayReturnController</servlet-name>
+        <url-pattern>/vnpay_return</url-pattern>
+    </servlet-mapping>
+ 
+    <servlet>
+        <servlet-name>PaymentHistoryController</servlet-name>
+        <servlet-class>controller.PaymentHistoryController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PaymentHistoryController</servlet-name>
+        <url-pattern>/payment_history</url-pattern>
+    </servlet-mapping>
+ 
+    <!-- ── Admin screens ────────────────────────────────────────────────── -->
+ 
+    <servlet>
+        <servlet-name>TransactionController</servlet-name>
+        <servlet-class>controller.TransactionController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TransactionController</servlet-name>
+        <url-pattern>/admin/transactions</url-pattern>
+    </servlet-mapping>
+ 
+    <servlet>
+        <servlet-name>RefundController</servlet-name>
+        <servlet-class>controller.RefundController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RefundController</servlet-name>
+        <url-pattern>/admin/refunds</url-pattern>
+    </servlet-mapping>
+ 
+
+
+    <servlet>
+        <servlet-name>NotificationController</servlet-name>
+        <servlet-class>controller.NotificationController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificationController</servlet-name>
+        <url-pattern>/notifications</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminNotificationController</servlet-name>
+        <servlet-class>controller.AdminNotificationController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminNotificationController</servlet-name>
+        <url-pattern>/admin/notifications</url-pattern>
+    </servlet-mapping>
+
+    <!-- ── Default welcome ──────────────────────────────────────────────── -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+ 
+</web-app>
+ 
