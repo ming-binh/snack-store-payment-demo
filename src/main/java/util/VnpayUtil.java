@@ -1,5 +1,8 @@
 package util;
-
+/**
+ * Author: VNPay sandbox description
+ * Created: 2026-03-19
+ */
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;

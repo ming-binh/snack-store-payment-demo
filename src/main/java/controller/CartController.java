@@ -1,13 +1,19 @@
 package controller;
- 
-import model.CartItem;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+ /**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.CartItem;
  
 public class CartController extends HttpServlet {
  
@@ -19,7 +25,6 @@ public class CartController extends HttpServlet {
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) {
             cart = new ArrayList<>();
-            // ── Demo items – in a real app load from DB cart table ────────
             cart.add(new CartItem(1, "Bắp rang bơ vị phô mai", new BigDecimal("35000"), 2, null));
             cart.add(new CartItem(2, "Khoai tây chiên vị BBQ",  new BigDecimal("28000"), 1, null));
             cart.add(new CartItem(3, "Snack mực cay vừa",       new BigDecimal("22000"), 3, null));

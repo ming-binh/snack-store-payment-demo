@@ -1,19 +1,21 @@
 package controller;
-
-import model.Notification;
-import service.NotificationService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+/**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * UC-Notify: Khách hàng xem và quản lý thông báo của mình.
- * GET  /notifications          — danh sách thông báo
- * POST /notifications?action=read&id=X     — đánh dấu 1 thông báo đã đọc
- * POST /notifications?action=readAll       — đánh dấu tất cả đã đọc
- */
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Notification;
+import service.NotificationService;
+
+
 public class NotificationController extends HttpServlet {
 
     private final NotificationService svc = new NotificationService();

@@ -1,5 +1,8 @@
 package controller;
-
+/**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
 public class VnpayConfig {
 
     public static final String VNP_TMN_CODE    = "4YUP19I4";

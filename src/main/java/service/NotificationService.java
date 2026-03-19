@@ -1,21 +1,14 @@
 package service;
-
+/**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
 import dao.NotificationDAO;
 import model.Notification;
 
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * UC-Notify: Gửi và quản lý thông báo in-app cho khách hàng.
- *
- * Được gọi tự động tại các điểm:
- *   - PaymentService.processCod()          → order_confirmed
- *   - PaymentService.handleVnpayReturn()   → payment_success / payment_failed
- *   - PaymentService.approveRefund()       → refund_approved
- *   - PaymentService.rejectRefund()        → refund_rejected
- *   - PaymentService.cancelPendingPayment()→ order_cancelled
- */
 public class NotificationService {
 
     private final NotificationDAO dao = new NotificationDAO();

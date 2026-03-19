@@ -1,5 +1,8 @@
 package controller;
-
+/**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
 import model.Notification;
 import service.NotificationService;
 import jakarta.servlet.ServletException;
@@ -9,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * UC-Notify (Admin): Xem toàn bộ lịch sử thông báo đã gửi.
+ * UC-Notify: Xem toàn bộ lịch sử thông báo đã gửi.
  * GET /admin/notifications?type=&page=
  */
 public class AdminNotificationController extends HttpServlet {

@@ -1,28 +1,21 @@
 package dao;
+/**
+ * Author: HE190438 Thân Bình Minh
+ * Created: 2026-03-19
+ */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import model.Notification;
 import util.DBUtil;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * DAO cho bảng notifications.
- *
- * DDL tham khảo (SQL Server):
- *   CREATE TABLE notifications (
- *     notification_id INT IDENTITY PRIMARY KEY,
- *     user_id         INT NOT NULL,
- *     order_id        INT DEFAULT 0,
- *     payment_id      INT DEFAULT 0,
- *     type            VARCHAR(50)  NOT NULL,
- *     title           NVARCHAR(200) NOT NULL,
- *     message         NVARCHAR(MAX) NOT NULL,
- *     is_read         BIT DEFAULT 0,
- *     created_at      DATETIME DEFAULT GETDATE()
- *   );
- */
 public class NotificationDAO {
 
     // ── Tạo thông báo ─────────────────────────────────────────────────
